@@ -1,0 +1,14 @@
+# common
+*.swp
+*~
+.*~
+.DS_Store
+.idea
+.secret
+
+# vagrant
+.vagrant/
+vendor/
+
+# chef
+/cookbooks/
