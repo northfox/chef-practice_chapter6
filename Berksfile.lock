@@ -1,0 +1,19 @@
+DEPENDENCIES
+  iptables
+    path: site-cookbooks/iptables
+  nginx
+    path: site-cookbooks/nginx
+  php-env
+    path: site-cookbooks/php-env
+  simple_iptables
+  yum-epel
+
+GRAPH
+  iptables (0.1.0)
+  nginx (0.1.0)
+    yum-epel (>= 0.0.0)
+  php-env (0.1.0)
+  simple_iptables (0.7.3)
+  yum (3.8.2)
+  yum-epel (0.6.5)
+    yum (~> 3.2)
