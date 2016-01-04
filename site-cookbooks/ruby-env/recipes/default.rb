@@ -6,6 +6,8 @@
 #
 # All rights reserved - Do Not Redistribute
 #
+rubyEnv = node['ruby-env']
+
 %w{
   gcc git openssl-devel sqlite-devel readline-devel
 }.each do |pkg|
@@ -14,40 +16,57 @@
   end
 end
 
-git "/home/#{ node['ruby-env']['user'] }/.rbenv" do
-  repository node['ruby-env']['rbenv_url']
+git "/home/#{ rubyEnv['user'] }/.rbenv" do
+  repository rubyEnv['rbenv_url']
   action :sync
-  user node['ruby-env']['user']
-  group node['ruby-env']['group']
+  user rubyEnv['user']
+  group rubyEnv['group']
 end
 
 template '.bash_profile' do
   source '.bash_profile.erb'
-  path "/home/#{ node['ruby-env']['user'] }/.bash_profile"
-  owner node['ruby-env']['user']
-  group node['ruby-env']['group']
+  path "/home/#{ rubyEnv['user'] }/.bash_profile"
+  owner rubyEnv['user']
+  group rubyEnv['group']
   mode 0644
-  not_if 'grep rbenv ~/.bash_profile', :environment => { :'HOME' => "/home/#{ node['ruby-env']['user'] }" }
+  not_if 'grep rbenv ~/.bash_profile', :environment => { :'HOME' => "/home/#{ rubyEnv['user'] }" }
 end
 
-directory "/home/#{ node['ruby-env']['user'] }/.rbenv/plugins" do
-  user node['ruby-env']['user']
-  group node['ruby-env']['group']
+directory "/home/#{ rubyEnv['user'] }/.rbenv/plugins" do
+  user rubyEnv['user']
+  group rubyEnv['group']
   mode 0755
   action :create
 end
 
-git "/home/#{ node['ruby-env']['user'] }/.rbenv/plugins/ruby-build" do
-  repository node['ruby-env']['ruby-build_url']
+git "/home/#{ rubyEnv['user'] }/.rbenv/plugins/ruby-build" do
+  repository rubyEnv['ruby-build_url']
   action :sync
-  user node['ruby-env']['user']
-  group node['ruby-env']['group']
+  user rubyEnv['user']
+  group rubyEnv['group']
 end
 
-execute "rbenv install #{ node['ruby-env']['version'] }" do
-  command "/home/#{ node['ruby-env']['user'] }/.rbenv/bin/rbenv install #{ node['ruby-env']['version'] }"
-  user node['ruby-env']['user']
-  group node['ruby-env']['group']
-  environment 'HOME' => "/home/#{ node['ruby-env']['user'] }"
-  not_if { File.exists?("/home/#{ node['ruby-env']['user'] }/.rbenv/versions/#{ node['ruby-env']['version'] }") }
+execute "rbenv install #{ rubyEnv['version'] }" do
+  command "/home/#{ rubyEnv['user'] }/.rbenv/bin/rbenv install #{ rubyEnv['version'] }"
+  user rubyEnv['user']
+  group rubyEnv['group']
+  environment 'HOME' => "/home/#{ rubyEnv['user'] }"
+  not_if { File.exists?("/home/#{ rubyEnv['user'] }/.rbenv/versions/#{ rubyEnv['version'] }") }
+end
+
+execute "rbenv global #{ rubyEnv['version'] }" do
+  command "/home/#{ rubyEnv['user'] }/.rbenv/bin/rbenv global #{ rubyEnv['version'] }"
+  user rubyEnv['user']
+  group rubyEnv['group']
+  environment 'HOME' => "/home/#{ rubyEnv['user'] }"
+end
+
+%w{ rbenv-rehash builder }.each do |gem|
+  execute "gem install #{ gem }" do
+    command "/home/#{ rubyEnv['user'] }/.rbenv/shims/gem install #{ gem }"
+    user rubyEnv['user']
+    group rubyEnv['group']
+    environment 'HOME' => "/home/#{ rubyEnv['user'] }"
+    not_if "/home/#{ rubyEnv['user'] }/.rbenv/shims/gem list | grep #{ gem }"
+  end
 end

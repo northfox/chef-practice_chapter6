@@ -9,7 +9,7 @@ Vagrant.configure(2) do |config|
 
     chef.json = {
       nginx: {
-        env: ['php']
+        env: ['php', 'ruby']
       }
     }
 

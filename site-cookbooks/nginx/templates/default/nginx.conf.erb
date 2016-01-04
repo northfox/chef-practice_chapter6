@@ -24,6 +24,12 @@ http {
     sendfile        on;
     keepalive_timeout  65;
 
+    <% if node['nginx']['env'].include?('ruby') %>
+    upstream unicorn {
+        server unix:/tmp/unicorn.sock;
+    }
+    <% end %>
+
     server {
         listen       80 default_server;
         server_name  _;
@@ -45,13 +51,20 @@ http {
             root   html;
         }
 
-        <% if node['nginx']['env'].include?("php") %>
+        <% if node['nginx']['env'].include?('php') %>
         # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
         location ~ \.php$ {
            fastcgi_pass   127.0.0.1:9000;
            fastcgi_index  index.php;
            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
            include        fastcgi_params;
+        }
+        <% end %>
+
+        <% if node['nginx']['env'].include?('ruby') %>
+        location /unicorn {
+            rewrite ^/unicorn/(.+) /$1 break;
+            proxy_pass http://unicorn/$1
         }
         <% end %>
     }
