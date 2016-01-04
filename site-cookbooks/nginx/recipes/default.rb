@@ -7,6 +7,7 @@
 # All rights reserved - Do Not Redistribute
 #
 include_recipe "yum-epel"
+include_recipe 'selinux::permissive'
 
 package 'nginx' do
   action :install
