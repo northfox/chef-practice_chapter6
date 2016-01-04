@@ -1,4 +1,4 @@
-user              nginx;
+user              vagrant; # nginx;
 worker_processes  1;
 
 
@@ -26,7 +26,7 @@ http {
 
     <% if node['nginx']['env'].include?('ruby') %>
     upstream unicorn {
-        server unix:/tmp/unicorn.sock;
+        server unix:/home/vagrant/tmp/unicorn.sock;
     }
     <% end %>
 
@@ -64,7 +64,7 @@ http {
         <% if node['nginx']['env'].include?('ruby') %>
         location /unicorn {
             rewrite ^/unicorn/(.+) /$1 break;
-            proxy_pass http://unicorn/$1
+            proxy_pass http://unicorn/$1;
         }
         <% end %>
     }

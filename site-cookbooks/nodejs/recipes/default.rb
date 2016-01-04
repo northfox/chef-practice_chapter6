@@ -27,4 +27,5 @@ bash 'install nodejs' do
     cd #{ nodejs['dirname'] }
     make && make install
   EOC
+  not_if "which node"
 end
