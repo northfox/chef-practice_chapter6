@@ -20,6 +20,7 @@ Vagrant.configure(2) do |config|
       recipe[nginx]
       recipe[php-env::php55]
       recipe[ruby-env]
+      recipe[nodejs]
     )
   end
 end
